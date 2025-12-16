@@ -1,0 +1,34 @@
+{
+  "type": "record",
+  "name": "Employee",
+  "namespace": "com.github.kafka_streams.avro",
+  "doc": "Employee record for Kafka Streams processing",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "doc": "Unique employee identifier"
+    },
+    {
+      "name": "name",
+      "type": "string",
+      "doc": "Employee full name"
+    },
+    {
+      "name": "department",
+      "type": "string",
+      "doc": "Department name"
+    },
+    {
+      "name": "designation",
+      "type": ["null", "string"],
+      "default": null,
+      "doc": "Job title/designation"
+    },
+    {
+      "name": "salary",
+      "type": "double",
+      "doc": "Employee salary"
+    }
+  ]
+}

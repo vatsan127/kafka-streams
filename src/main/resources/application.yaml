@@ -5,26 +5,34 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     streams:
-      application-id: kafka-streams-app                   # Unique ID for your streams app (consumer group)
+      application-id: kafka-streams-app                                                   # Unique ID for your streams app (consumer group)
       bootstrap-servers: ${spring.kafka.bootstrap-servers}
 
       properties:
-        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-        default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
-        processing.guarantee: at_least_once               # at_least_once (default) or exactly_once_v2
-        commit.interval.ms: 1000                          # How often to save processor state
-        replication.factor: 1                             # For changelog/repartition topics
-        num.stream.threads: 1                             # Number of stream threads (parallelism)
-        consumer.max.poll.records: 1000                   # Max records returned per poll() call
-        consumer.fetch.max.bytes: 52428800                # Max data per fetch request (50MB)
-        consumer.fetch.min.bytes: 1                       # Min data to return (broker waits if less)
-        consumer.auto.offset.reset: earliest              # Where to start if no offset exists
+        schema.registry.url: http://localhost:8081                                        # Confluent Schema Registry URL
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde      # Default key serde
+        default.value.serde: io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde    # Default value serde (Avro)
+        specific.avro.reader: true                                                        # Use generated Avro classes (not GenericRecord)
+        auto.register.schemas: true                                                       # Auto-register schemas on first produce
+        processing.guarantee: at_least_once                                               # at_least_once (default) or exactly_once_v2
+        commit.interval.ms: 1000                                                          # How often to save processor state
+        replication.factor: 1                                                             # For changelog/repartition topics (use 3 in prod)
+        num.stream.threads: 1                                                             # Number of stream threads (parallelism)
+        consumer.max.poll.records: 1000                                                   # Max records returned per poll() call
+        consumer.fetch.max.bytes: 52428800                                                # Max data per fetch request (50MB)
+        consumer.fetch.min.bytes: 1                                                       # Min data to return (broker waits if less)
+        consumer.auto.offset.reset: earliest                                              # Where to start if no offset exists
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer               # Avro serializer for KafkaTemplate
+      properties:
+        schema.registry.url: http://localhost:8081
 
     consumer:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer           # Avro deserializer for @KafkaListener
       auto-offset-reset: earliest
+      properties:
+        schema.registry.url: http://localhost:8081
+        specific.avro.reader: true                                                        # Use generated Avro classes
