@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: kafka-streams
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    streams:
+      application-id: kafka-streams-app                   # Unique ID for your streams app (consumer group)
+      bootstrap-servers: ${spring.kafka.bootstrap-servers}
+
+      properties:
+        default.key.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        default.value.serde: org.apache.kafka.common.serialization.Serdes$StringSerde
+        processing.guarantee: at_least_once               # at_least_once (default) or exactly_once_v2
+        commit.interval.ms: 1000                          # How often to save processor state
+        replication.factor: 1                             # For changelog/repartition topics
+        num.stream.threads: 1                             # Number of stream threads (parallelism)
+        consumer.max.poll.records: 1000                   # Max records returned per poll() call
+        consumer.fetch.max.bytes: 52428800                # Max data per fetch request (50MB)
+        consumer.fetch.min.bytes: 1                       # Min data to return (broker waits if less)
+        consumer.auto.offset.reset: earliest              # Where to start if no offset exists
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      auto-offset-reset: earliest
