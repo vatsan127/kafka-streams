@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- Properties -->
+    <property name="LOG_DIR" value="${LOG_PATH:-logs}"/>
+    <property name="APP_NAME" value="kafka-streams"/>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"/>
+    <property name="LOG_PATTERN_COLORED" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%blue(%thread)] %cyan(%logger{36}) - %msg%n"/>
+
+    <!-- Console Appender -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN_COLORED}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Rolling File Appender -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${APP_NAME}.log</file>
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${APP_NAME}-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- =========================== -->
+    <!-- Logger Configurations       -->
+    <!-- =========================== -->
+
+    <!-- Application Loggers -->
+    <logger name="com.github.kafka_streams" level="DEBUG"/>
+
+    <!-- Kafka Streams -->
+    <logger name="org.apache.kafka.streams" level="INFO"/>
+    <logger name="org.apache.kafka.streams.processor.internals" level="WARN"/>
+    <logger name="org.apache.kafka.streams.state" level="INFO"/>
+
+    <!-- Kafka Client -->
+    <logger name="org.apache.kafka.clients" level="WARN"/>
+    <logger name="org.apache.kafka.clients.consumer" level="INFO"/>
+    <logger name="org.apache.kafka.clients.producer" level="INFO"/>
+    <logger name="org.apache.kafka.common.metrics" level="WARN"/>
+
+    <!-- Confluent Schema Registry -->
+    <logger name="io.confluent.kafka" level="INFO"/>
+    <logger name="io.confluent.kafka.serializers" level="WARN"/>
+
+    <!-- Spring Framework -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.kafka" level="INFO"/>
+    <logger name="org.springframework.web" level="INFO"/>
+
+    <!-- Reduce noisy loggers -->
+    <logger name="org.apache.zookeeper" level="WARN"/>
+    <logger name="org.apache.kafka.common.utils.AppInfoParser" level="WARN"/>
+
+    <!-- Root Logger -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+</configuration>
