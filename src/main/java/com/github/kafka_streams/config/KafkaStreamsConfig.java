@@ -25,10 +25,6 @@ import org.springframework.kafka.annotation.EnableKafkaStreams;
 @Slf4j
 public class KafkaStreamsConfig {
 
-    public static final String INPUT_TOPIC = "input-topic";
-    public static final String OUTPUT_TOPIC = "output-topic";
-    public static final String FILTERED_TOPIC = "filtered-topic";
-
     public static final String EMPLOYEE_TOPIC = "employee-topic";
     public static final String ENGINEERING_TOPIC = "engineering-employees";
     public static final String EMPLOYEE_WITH_BONUS_TOPIC = "employee-with-bonus";
@@ -38,20 +34,21 @@ public class KafkaStreamsConfig {
      * Simple String stream topology.
      * Uses explicit String serdes (overrides default Avro serde).
      */
-    @Bean
+
+//    @Bean
     public KStream<String, String> kStream(StreamsBuilder streamsBuilder) {
         KStream<String, String> stream = streamsBuilder.stream(
-                INPUT_TOPIC,
+                "input-topic",
                 Consumed.with(Serdes.String(), Serdes.String())  // Override default for String topics
         );
 
         stream.peek((key, value) -> log.info("Received - Key: {}, Value: {}", key, value))
-                .to(OUTPUT_TOPIC, Produced.with(Serdes.String(), Serdes.String()));
+                .to("output-topic", Produced.with(Serdes.String(), Serdes.String()));
 
         stream.filter((key, value) -> value.length() > 5)
                 .peek((key, value) -> log.info("Filtered (length > 5) - Key: {}, Value: {}", key, value))
                 .to(
-                        FILTERED_TOPIC, Produced.with(Serdes.String(), Serdes.String()) // Explicitly mention the SERDE
+                        "filtered-topic", Produced.with(Serdes.String(), Serdes.String()) // Explicitly mention the SERDE
                 );
 
         return stream;
